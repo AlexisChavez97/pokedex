@@ -33,9 +33,9 @@ class Pokemon < BaseModel
 
   def info
     {
-      abilities: abilities,
-      types: types,
-      stats: stats
+      abilities:,
+      types:,
+      stats:
     }
   end
 

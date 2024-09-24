@@ -11,7 +11,7 @@ TEST_DB_URL = "postgres://postgres:postgres@localhost/test_pokedex_db"
 
 class Minitest::Test
   include Dry::Monads[:result]
-  
+
   def setup
     DB.tables.each { |table| DB[table].delete }
     Schema.new(DB).setup_schema

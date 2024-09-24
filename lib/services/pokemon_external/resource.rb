@@ -5,7 +5,7 @@ module PokemonExternal
     include Dry::Monads[:result]
 
     CACHE_POLICY = -> { Time.now - 3600 }
-    
+
     attr_reader :client
 
     def initialize(client)
@@ -15,7 +15,7 @@ module PokemonExternal
     private
       def get_request(url, params = {})
         cache_key = "#{url}?#{URI.encode_www_form(params)}"
-        
+
         ApiRequest.cache(cache_key, CACHE_POLICY) do
           case client
           when PokemonExternal::SeleniumClient

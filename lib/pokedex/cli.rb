@@ -3,7 +3,7 @@
 module Pokedex
   class CLI
     attr_reader :scraper
-    
+
     def initialize(scraper: Pokedex::Scraper.new)
       @scraper = scraper
     end
@@ -20,7 +20,7 @@ module Pokedex
       loop do
         puts "\nEnter a Pokémon name to search (or type 'exit' to quit):"
         input = gets.chomp.downcase
-        break if input == 'exit'
+        break if input == "exit"
 
         results = Pokemon.search(input)
         if results.empty?
@@ -56,12 +56,12 @@ module Pokedex
 
       def fetch_and_display_pokemon(pokemon)
         display_result(pokemon)
-        
-        if pokemon.info_is_empty?
-          puts "Note: Detailed information for #{pokemon.name} is currently being fetched."
-          puts "Please check again in a few moments for complete information."
-          scraper.priority_enqueue(pokemon)
-        end
+
+        return unless pokemon.info_is_empty?
+
+        puts "Note: Detailed information for #{pokemon.name} is currently being fetched."
+        puts "Please check again in a few moments for complete information."
+        scraper.priority_enqueue(pokemon)
       end
 
       def display_result(pokemon)

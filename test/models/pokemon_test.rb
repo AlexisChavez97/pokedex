@@ -44,13 +44,13 @@ class PokemonTest < Minitest::Test
 
   def test_it_updates_pokemon_with_new_info
     @subject.save
-    @subject.update(types: ["Electric", "Steel"], abilities: ["Static", "Lightning Rod"],
+    @subject.update(types: %w[Electric Steel], abilities: ["Static", "Lightning Rod"],
                     stats: { hp: 100, attack: 100, defense: 100, special_attack: 100, special_defense: 100, speed: 100 })
 
     pokemon = Pokemon.find_by(name: "Pikachu")
 
     assert_equal 25, pokemon.pokedex_number
-    assert_equal ["Electric", "Steel"], pokemon.types
+    assert_equal %w[Electric Steel], pokemon.types
     assert_equal ["Static", "Lightning Rod"], pokemon.abilities
     assert_equal 100, pokemon.stats[:hp]
     assert_equal 100, pokemon.stats[:attack]

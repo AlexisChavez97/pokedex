@@ -2,7 +2,7 @@
 
 class Schema
   attr_reader :db
-  
+
   def initialize(db = DB)
     @db = db
     setup_schema
@@ -20,20 +20,20 @@ class Schema
       primary_key :id
       Integer :pokedex_number, unique: true, index: true, null: false
       String :name, unique: true, index: true, null: false
-      column :types, "text[]"
-      column :abilities, "text[]"
+      column :types, 'text[]'
+      column :abilities, 'text[]'
       Json :stats
       DateTime :created_at
       DateTime :updated_at
     end
 
     unless db.indexes(:pokemons).key?(:idx_pokemons_types)
-      db.run("CREATE INDEX idx_pokemons_types ON pokemons USING gin (types)")
+      db.run('CREATE INDEX idx_pokemons_types ON pokemons USING gin (types)')
     end
 
-    unless db.indexes(:pokemons).key?(:idx_pokemons_abilities)
-      db.run("CREATE INDEX idx_pokemons_abilities ON pokemons USING gin (abilities)")
-    end
+    return if db.indexes(:pokemons).key?(:idx_pokemons_abilities)
+
+    db.run('CREATE INDEX idx_pokemons_abilities ON pokemons USING gin (abilities)')
   end
 
   def setup_api_requests_table

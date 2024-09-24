@@ -2,7 +2,7 @@
 
 class BaseModel
   include Dry::Monads[:result]
-  
+
   class << self
     attr_reader :table_name, :presence_validations
 
@@ -62,10 +62,10 @@ class BaseModel
 
   def save
     return false unless valid?
-    
+
     set_timestamps
     attributes = to_h
-  
+
     begin
       persist_record(attributes)
       true
@@ -105,7 +105,7 @@ class BaseModel
       self.updated_at = now
       self.created_at ||= now
     end
-    
+
     def persist_record(attributes)
       if id
         update_existing_record(attributes)
@@ -113,15 +113,15 @@ class BaseModel
         create_new_record(attributes)
       end
     end
-    
+
     def update_existing_record(attributes)
-      self.class.dataset.where(id: id).update(attributes)
+      self.class.dataset.where(id:).update(attributes)
     end
-    
+
     def create_new_record(attributes)
       self.id = self.class.dataset.insert(attributes)
     end
-    
+
     def handle_constraint_violation(error)
       errors.add(:base, error.message)
     end

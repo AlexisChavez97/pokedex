@@ -5,9 +5,9 @@ require "pry"
 module Pokedex
   class Scraper
     include Dry::Monads[:result, :try]
-  
+
     attr_reader :client, :parser, :queue
-    
+
     def initialize(client: PokemonExternal::SeleniumClient.new, parser: Pokedex::Parser.new)
       @client = client
       @parser = parser
@@ -18,9 +18,9 @@ module Pokedex
       return Success(Pokemon.all) if pokedex_populated?
 
       client.get(resource: "pokemon_index")
-        .bind { |html| parser.parse_pokemon_index(html) }
-        .bind { |pokemon_list| save_pokemon_index(pokemon_list) }
-        .or { |error| puts "Failed to fetch and save pokemon index: #{error}" }
+            .bind { |html| parser.parse_pokemon_index(html) }
+            .bind { |pokemon_list| save_pokemon_index(pokemon_list) }
+            .or { |error| puts "Failed to fetch and save pokemon index: #{error}" }
     end
 
     def queue_and_fetch_all_pokemon_info
@@ -49,9 +49,9 @@ module Pokedex
         return Success(pokemon) unless pokemon.info_is_empty?
 
         client.get(resource: "pokemon_info", params: { name: pokemon.name })
-          .bind { |html| parser.parse_pokemon_info(html) }
-          .bind { |pokemon_info| update_pokemon_info(pokemon, pokemon_info) }
-          .or { |error| puts "Failed to fetch and update pokemon info: #{error}" }
+              .bind { |html| parser.parse_pokemon_info(html) }
+              .bind { |pokemon_info| update_pokemon_info(pokemon, pokemon_info) }
+              .or { |error| puts "Failed to fetch and update pokemon info: #{error}" }
       end
 
       def save_pokemon_index(pokemon_list)

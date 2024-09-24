@@ -16,7 +16,13 @@ module Pokedex
     end
 
     def next_in_queue
-      @priority_queue.pop(true) rescue @regular_queue.pop(true) rescue nil
+      begin
+        @priority_queue.pop(true)
+      rescue StandardError
+        @regular_queue.pop(true)
+      end
+    rescue StandardError
+      nil
     end
   end
 end

@@ -1,0 +1,10 @@
+inherit_gem:
+  rubocop-rails_config:
+    - config/rails.yml
+
+# Override Setting
+AllCops:
+  TargetRubyVersion: 3.2
+
+Rails/RefuteMethods:
+  Enabled: false

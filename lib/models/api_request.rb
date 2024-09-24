@@ -10,11 +10,11 @@ class ApiRequest < BaseModel
   columns :url, :response_data, :created_at, :updated_at
 
   def self.find_by_url(url)
-    find_by(url: url)
+    find_by(url:)
   end
 
   def self.cache(url, cache_policy)
-    instance = find_by_url(url) || new(url: url)
+    instance = find_by_url(url) || new(url:)
     instance.cache(cache_policy) { yield if block_given? }
   end
 

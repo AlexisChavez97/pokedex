@@ -3,14 +3,14 @@
 module Pokedex
   class Parser
     include Dry::Monads[:result]
-  
+
     def parse_pokemon_index(html)
       doc = Nokogiri::HTML(html)
       pokemon_list = []
 
       doc.css("noscript ul li").each do |pokemon_li|
         number, name = pokemon_li.at_css("a").text.strip.split("-").map(&:strip)
-        pokemon_list << { pokedex_number: number.to_i, name: name }
+        pokemon_list << { pokedex_number: number.to_i, name: }
       end
 
       Success(pokemon_list)
@@ -24,11 +24,11 @@ module Pokedex
       types = extract_types(doc)
       abilities = extract_abilities(doc)
       stats = extract_stats(doc)
-      
+
       pokemon_info = {
-        types: types,
-        abilities: abilities,
-        stats: stats
+        types:,
+        abilities:,
+        stats:
       }
 
       Success(pokemon_info)
