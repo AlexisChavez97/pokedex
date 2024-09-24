@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-module Pokemon
+module PokemonExternal
   class SeleniumClient
     BASE_URL = "https://www.pokemon.com"
 
     def get(resource:, **params)
-      Pokemon::Resources.const_get(resource.classify).new(self).get(params)
+      PokemonExternal::Resources.const_get(resource.classify).new(self).get(params)
     end
 
     def driver

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Pokemon
+module PokemonExternal
   class Resource
     include Dry::Monads[:result]
 
@@ -16,11 +16,11 @@ module Pokemon
       def get_request(url, params = {})
         cache_key = "#{url}?#{URI.encode_www_form(params)}"
         
-        Models::ApiRequest.cache(cache_key, CACHE_POLICY) do
+        ApiRequest.cache(cache_key, CACHE_POLICY) do
           case client
-          when Pokemon::SeleniumClient
+          when PokemonExternal::SeleniumClient
             handle_selenium(client.fetch_page(url))
-          when Pokemon::Client
+          when PokemonExternal::Client
             handle_http(client.connection.get(url, params))
           end
         end

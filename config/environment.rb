@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "pry"
+
 module AppConfig
   class << self
     def load
@@ -16,3 +18,4 @@ end
 DB = Sequel.connect(AppConfig.database_url)
 DB.extension :pg_json
 DB.extension :pg_array
+Sequel.extension :pg_array_ops

@@ -3,7 +3,7 @@
 ENV["APP_ENV"] = "test"
 
 require_relative "../config/application"
-require_relative "../db/pokedex"
+require_relative "../db/schema"
 require "minitest/autorun"
 require "timecop"
 
@@ -14,7 +14,7 @@ class Minitest::Test
   
   def setup
     DB.tables.each { |table| DB[table].delete }
-    Pokedex.new(DB).setup_schema
+    Schema.new(DB).setup_schema
   end
 
   def mock_pokemon_index_response

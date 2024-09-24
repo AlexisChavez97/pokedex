@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Pokemon
+module PokemonExternal
   class Client
     include Dry::Monads[:result]
     
@@ -11,7 +11,7 @@ module Pokemon
     end
 
     def get(resource:, **params)
-      Pokemon::Resources.const_get(resource.classify).new(self).get(params)
+      PokemonExternal::Resources.const_get(resource.classify).new(self).get(params)
     end
 
     def connection
