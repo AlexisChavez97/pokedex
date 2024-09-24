@@ -1,53 +1,69 @@
 # frozen_string_literal: true
+require "pry"
 
 class PokeScraper
-  include Dry::Monads[:result]
+  include Dry::Monads[:result, :try]
   
-  attr_reader :client, :parser, :repository
+  attr_reader :client, :parser
   
-  def initialize(client:, parser:, repository:)
+  def initialize(client:, parser:)
     @client = client
     @parser = parser
-    @repository = repository
   end
 
-  def scrape_and_save
-    client.get(resource: "pokemon_index")
-           .bind { |html| parser.parse_pokemon_index(html) }
-           .bind { |pokemon_list| maybe_save_pokemon_index(pokemon_list) }
-           .or { |error| puts "Error: #{error}" }
+  def call
+    ensure_pokemon_index
+      .bind { fetch_and_update_pokemon_info }
+      .or { |error| Failure("Scraping failed: #{error}") }
   end
 
   private
-    def maybe_save_pokemon_index(pokemon_list)
+    def ensure_pokemon_index
       if pokedex_populated?
-        update_pokemon_details(pokemon_list)
+        Success(Models::Pokemon.all)
       else
-        save_pokemon_index(pokemon_list)
+        fetch_and_save_pokemon_index
       end
     end
 
-    def update_pokemon_details(pokemon_list)
-      pokemon_list.each do |pokemon|
-        client.get(resource: "pokemon_details", name: pokemon[:name])
-              .bind { |html| parser.parse_pokemon_details(html) }
-              .bind { |details| pokemon.merge!(details) }
-              .or { |error| puts "Failed to fetch details for #{pokemon[:name]}: #{error}" }
-      end
-
-      repository.save_all(pokemon_list)
-      Success()
+    def fetch_and_save_pokemon_index
+      client.get(resource: "pokemon_index")
+        .bind { |html| parser.parse_pokemon_index(html) }
+        .bind { |pokemon_list| save_pokemon_index(pokemon_list) }
     end
 
     def save_pokemon_index(pokemon_list)
-      if repository.save_all(pokemon_list)
-        Success("The pokedex has been updated!")
-      else
-        Failure("Failed to save Pokémon index")
+      Try do
+        pokemon_list.map do |pokemon_info|
+          Models::Pokemon.create(pokemon_info)
+        end
+      end.to_result
+    end
+
+    def fetch_and_update_pokemon_info
+      Models::Pokemon.all.map do |pokemon|
+        fetch_and_update_pokemon_detail(pokemon)
       end
+      Success("Pokemon info updated successfully")
+    end
+
+    def fetch_and_update_pokemon_detail(pokemon)
+      return Success(pokemon) unless pokemon.info_is_empty?
+
+      client.get(resource: "pokemon_info", name: pokemon.name)
+        .bind { |html| parser.parse_pokemon_info(html) }
+        .bind { |info| update_pokemon_info(pokemon, info) }
+        .or { |error| Failure("Failed to update info for #{pokemon.name}: #{error}") }
+    end
+
+    def update_pokemon_info(pokemon, info)
+      Try do
+        pokemon.update(info)
+        pokemon
+      end.to_result
     end
 
     def pokedex_populated?
-      repository.db[:pokemons].any?
+      Models::Pokemon.all.count > 0
     end
 end

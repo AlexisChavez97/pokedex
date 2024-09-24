@@ -9,13 +9,13 @@ module ProxyScrape
     def fetch_proxies
       Success(premium_proxies_list)
       
-      # response = connection.get('/v4/free-proxy-list/get', {
-      #   request: 'display_proxies',
-      #   proxy_format: 'protocolipport',
-      #   format: 'text',
-      #   anonymity: 'elite',
-      #   protocol: 'http',
-      #   country: 'us',
+      # response = connection.get("/v4/free-proxy-list/get", {
+      #   request: "display_proxies",
+      #   proxy_format: "protocolipport",
+      #   format: "text",
+      #   anonymity: "elite",
+      #   protocol: "http",
+      #   country: "us",
       #   timeout: 500
       # })
 
@@ -25,8 +25,8 @@ module ProxyScrape
     private
       def connection
         @connection ||= Faraday.new(BASE_URL) do |conn|
-          conn.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-          conn.headers['Accept'] = 'text/plain'
+          conn.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+          conn.headers["Accept"] = "text/plain"
           conn.adapter Faraday.default_adapter
         end
       end
@@ -40,7 +40,7 @@ module ProxyScrape
       end
 
       def premium_proxies_list
-        proxies = File.read(File.join(__dir__, 'premium_proxies.txt')).split("\n")
+        proxies = File.read(File.join(__dir__, "premium_proxies.txt")).split("\n")
         proxies.map! { |proxy| "http://#{proxy.strip}" }
       end
   end

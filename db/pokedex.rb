@@ -13,16 +13,9 @@ class Pokedex
       primary_key :id
       Integer :pokedex_number
       String :name
-      String :types
-      String :abilities
-      Float :height
-      Float :weight
-      Integer :hp
-      Integer :attack
-      Integer :defense
-      Integer :special_attack
-      Integer :special_defense
-      Integer :speed
+      column :types, "text[]"
+      column :abilities, "text[]"
+      Json :stats
       DateTime :created_at
       DateTime :updated_at
     end

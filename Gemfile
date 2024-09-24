@@ -2,20 +2,19 @@
 
 source "https://rubygems.org"
 
-gem "activesupport", require: "active_support/inflector"
+gem "activesupport", require: ["active_support/inflector", "active_support/hash_with_indifferent_access"]
 gem "dry-monads"
 gem "faraday"
 gem "json"
 gem "minitest"
 gem "nokogiri"
 gem "pg"
-gem "pry"
 gem "rake"
 gem "selenium-webdriver", "~> 4.11"
 gem "sequel"
 gem "timecop"
 gem "yaml"
 
-group :test do
-  gem "webmock"
+group :development, :test do
+  gem "pry-byebug"
 end

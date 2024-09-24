@@ -2,10 +2,10 @@
 
 module Pokemon
   module Resources
-    class PokemonDetails < Resource
+    class PokemonInfo < Resource
       def get(params)
         pokemon_name = params[:name].downcase
-        get_request("/el/pokedex/#{pokemon_name}").fmap { |response| response }
+        get_request("/us/pokedex/#{pokemon_name}").fmap { |response| response }
       end
     end
   end
