@@ -14,3 +14,5 @@ end
 
 # Initialize the database connection
 DB = Sequel.connect(AppConfig.database_url)
+DB.extension :pg_json
+DB.extension :pg_array

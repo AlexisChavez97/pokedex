@@ -46,16 +46,22 @@ module Models
     end
   
     def cache(cache_policy)
-      if new_record? || updated_at.nil? || updated_at < cache_policy.call
-        result = yield
-        if result.success?
-          self.response_data = result.value!.to_json
-          save
-        end
-        result
-      else
-        Success(JSON.parse(response_data))
-      end
+      return Success(response_data) if cached?(cache_policy)
+
+      result = yield
+      update_cache(result) if result.success?
+      result
+    end
+
+    private
+
+    def cached?(cache_policy)
+      !new_record? && updated_at && updated_at >= cache_policy.call
+    end
+
+    def update_cache(result)
+      self.response_data = result.value!.to_json
+      save
     end
 
     def body

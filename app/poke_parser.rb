@@ -8,7 +8,7 @@ class PokeParser
     pokemon_list = []
 
     doc.css("noscript ul li").each do |pokemon_li|
-      number, name = pokemon_li.at_css('a').text.strip.split("-").map(&:strip)
+      number, name = pokemon_li.at_css("a").text.strip.split("-").map(&:strip)
       pokemon_list << { pokedex_number: number.to_i, name: name }
     end
 
@@ -17,27 +17,33 @@ class PokeParser
     Failure("Error parsing Pokémon index: #{e.message}")
   end
 
-  def parse_pokemon_details(html)
+  def parse_pokemon_info(html)
     doc = Nokogiri::HTML(html)
 
-    abilities = doc.css(".attribute-list li a .attribute-value").map(&:text).join(", ")
-    height = doc.at_css(".attribute-title:contains('Altura')").next_element.text.strip.to_f
-    weight = doc.at_css(".attribute-title:contains('Peso')").next_element.text.strip.to_f
-
+    types = extract_types(doc)
+    abilities = extract_abilities(doc)
     stats = extract_stats(doc)
     
-    pokemon_data = {
+    pokemon_info = {
+      types: types,
       abilities: abilities,
-      height: height,
-      weight: weight
-    }.merge(stats)
+      stats: stats
+    }
 
-    Success(pokemon_data)
+    Success(pokemon_info)
   rescue StandardError => e
-    Failure("Error parsing Pokémon details: #{e.message}")
+    Failure("Error parsing Pokémon info: #{e.message}")
   end
 
   private
+    def extract_types(doc)
+      doc.css(".dtm-type ul li a").map(&:text)
+    end
+
+    def extract_abilities(doc)
+      doc.css(".attribute-list li a .attribute-value").map(&:text)
+    end
+
     def extract_stats(doc)
       stats_map = {}
       stats_elements = doc.css(".pokemon-stats-info ul li")
