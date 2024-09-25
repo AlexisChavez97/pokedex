@@ -94,7 +94,7 @@ class Pokedex::ScraperTest < Minitest::Test
   def test_fetch_and_update_pokemon_info_when_empty
     pokemon = Pokemon.new(name: "bulbasaur", pokedex_number: 1)
 
-    @client.expect(:get, Success(@mock_info_response), resource: "pokemon_info", params: { name: "bulbasaur" })
+    @client.expect(:get, Success(@mock_info_response), resource: "pokemon_info", name: "bulbasaur")
     @parser.expect(:parse_pokemon_info, Success(@mock_parsed_info), [@mock_info_response])
 
     result = @subject.send(:fetch_and_update_pokemon_info, pokemon)

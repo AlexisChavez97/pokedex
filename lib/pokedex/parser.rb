@@ -9,7 +9,10 @@ module Pokedex
       pokemon_list = []
 
       doc.css("noscript ul li").each do |pokemon_li|
-        number, name = pokemon_li.at_css("a").text.strip.split("-").map(&:strip)
+        link = pokemon_li.at_css("a")
+        name = link["href"].split("/").last
+        number = link.text.split("-").first.strip.delete(",")
+
         pokemon_list << { pokedex_number: number.to_i, name: }
       end
 
