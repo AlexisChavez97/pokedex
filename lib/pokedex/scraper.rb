@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "pry"
-
 module Pokedex
   class Scraper
     include Dry::Monads[:result, :try]
@@ -15,12 +13,13 @@ module Pokedex
     end
 
     def fetch_and_save_pokemon_index
-      return Success(Pokemon.all) if pokedex_populated?
+      return Success(:populated) if pokedex_populated?
 
       client.get(resource: "pokemon_index")
             .bind { |html| parser.parse_pokemon_index(html) }
             .bind { |pokemon_list| save_pokemon_index(pokemon_list) }
-            .or { |error| puts "Failed to fetch and save pokemon index: #{error}" }
+            .fmap { |_| :populated }
+            .or { |error| Failure("Failed to fetch and pokemons: #{error}") }
     end
 
     def queue_and_fetch_all_pokemon_info
@@ -48,7 +47,7 @@ module Pokedex
       def fetch_and_update_pokemon_info(pokemon)
         return Success(pokemon) unless pokemon.info_is_empty?
 
-        client.get(resource: "pokemon_info", params: { name: pokemon.name })
+        client.get(resource: "pokemon_info", name: pokemon.name)
               .bind { |html| parser.parse_pokemon_info(html) }
               .bind { |pokemon_info| update_pokemon_info(pokemon, pokemon_info) }
               .or { |error| puts "Failed to fetch and update pokemon info: #{error}" }

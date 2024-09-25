@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "pry"
 require_relative "../test_helper"
+require "ostruct"
 
 class Pokedex::CLITest < Minitest::Test
   def setup
@@ -14,7 +14,6 @@ class Pokedex::CLITest < Minitest::Test
     output = StringIO.new
 
     @scraper.expect(:fetch_and_save_pokemon_index, Success(nil))
-    @scraper.expect(:queue_and_fetch_all_pokemon_info, nil)
 
     simulate_cli_run(input, output) do
       @cli.start
@@ -29,7 +28,6 @@ class Pokedex::CLITest < Minitest::Test
     output = StringIO.new
 
     @scraper.expect(:fetch_and_save_pokemon_index, Success(nil))
-    @scraper.expect(:queue_and_fetch_all_pokemon_info, nil)
 
     Pokemon.stub :search, [] do
       simulate_cli_run(input, output) do
@@ -45,7 +43,7 @@ class Pokedex::CLITest < Minitest::Test
     input = StringIO.new("pikachu\n1\nexit\n")
     output = StringIO.new
 
-    @scraper.expect(:fetch_and_save_pokemon_index, Success(nil))
+    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated))
     @scraper.expect(:queue_and_fetch_all_pokemon_info, nil)
 
     mock_pokemon = OpenStruct.new(
@@ -64,6 +62,10 @@ class Pokedex::CLITest < Minitest::Test
     end
 
     expected_output = <<~OUTPUT
+      Initializing Pokedex...
+      Fetching and saving Pokemon...
+      Pokédex data successfully fetched and saved.
+
       Enter a Pokémon name to search (or type 'exit' to quit):
       Found 1 result(s):
       1. Pikachu (25)
@@ -88,7 +90,7 @@ class Pokedex::CLITest < Minitest::Test
     input = StringIO.new("pikachu\n1\nexit\n")
     output = StringIO.new
 
-    @scraper.expect(:fetch_and_save_pokemon_index, Success(nil))
+    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated))
     @scraper.expect(:queue_and_fetch_all_pokemon_info, nil)
     @scraper.expect(:priority_enqueue, nil, [Object])
 
@@ -108,6 +110,10 @@ class Pokedex::CLITest < Minitest::Test
     end
 
     expected_output = <<~OUTPUT
+      Initializing Pokedex...
+      Fetching and saving Pokemon...
+      Pokédex data successfully fetched and saved.
+
       Enter a Pokémon name to search (or type 'exit' to quit):
       Found 1 result(s):
       1. Pikachu (25)
@@ -134,7 +140,7 @@ class Pokedex::CLITest < Minitest::Test
     input = StringIO.new("electric\n1\nexit\n")
     output = StringIO.new
 
-    @scraper.expect(:fetch_and_save_pokemon_index, Success(nil))
+    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated))
     @scraper.expect(:queue_and_fetch_all_pokemon_info, nil)
     @scraper.expect(:priority_enqueue, nil, [Object])
 
@@ -163,6 +169,10 @@ class Pokedex::CLITest < Minitest::Test
     end
 
     expected_output = <<~OUTPUT
+      Initializing Pokedex...
+      Fetching and saving Pokemon...
+      Pokédex data successfully fetched and saved.
+
       Enter a Pokémon name to search (or type 'exit' to quit):
       Found 2 result(s):
       1. Pikachu (25)

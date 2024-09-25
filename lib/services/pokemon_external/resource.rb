@@ -4,7 +4,7 @@ module PokemonExternal
   class Resource
     include Dry::Monads[:result]
 
-    CACHE_POLICY = -> { Time.now - 3600 }
+    CACHE_POLICY = -> { Time.now - 1.day }
 
     attr_reader :client
 
@@ -35,13 +35,21 @@ module PokemonExternal
       end
 
       def handle_selenium(response)
-        return Failure("Empty response") if response.empty? || blocked?(response)
+        return Failure("Bad response") if bad_response?(response)
 
         Success(response)
       end
 
       def blocked?(response)
         response.include?("noindex,nofollow")
+      end
+
+      def response_empty?(response)
+        response.include?("Imperva") || response.include?("<body></body>")
+      end
+
+      def bad_response?(response)
+        response_empty?(response) || blocked?(response)
       end
   end
 end

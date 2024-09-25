@@ -2,6 +2,7 @@
 
 module Pokedex
   class CLI
+    include Dry::Monads[:result, :try]
     attr_reader :scraper
 
     def initialize(scraper: Pokedex::Scraper.new)
@@ -9,14 +10,24 @@ module Pokedex
     end
 
     def start
+      puts "Initializing Pokedex..."
+      puts "Fetching and saving Pokemon..."
+
       result = scraper.fetch_and_save_pokemon_index
-      if result.success?
+
+      case result
+      when Success(:populated)
+        puts "Pokédex data successfully fetched and saved."
         scraper.queue_and_fetch_all_pokemon_info
-      else
-        puts "Failed to fetch and save Pokemon index. Please try again later."
+      when Failure
+        puts result.failure
         return
       end
 
+      main_loop
+    end
+
+    def main_loop
       loop do
         puts "\nEnter a Pokémon name to search (or type 'exit' to quit):"
         input = gets.chomp.downcase
