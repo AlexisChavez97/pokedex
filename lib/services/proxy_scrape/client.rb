@@ -7,19 +7,19 @@ module ProxyScrape
     BASE_URL = "https://api.proxyscrape.com"
 
     def fetch_proxies
-      Success(premium_proxies_list)
+      # Success(premium_proxies_list)
 
-      # response = connection.get("/v4/free-proxy-list/get", {
-      #   request: "display_proxies",
-      #   proxy_format: "protocolipport",
-      #   format: "text",
-      #   anonymity: "elite",
-      #   protocol: "http",
-      #   country: "us",
-      #   timeout: 500
-      # })
+      response = connection.get("/v4/free-proxy-list/get", {
+        request: "display_proxies",
+        proxy_format: "protocolipport",
+        format: "text",
+        anonymity: "elite",
+        protocol: "http",
+        country: "us",
+        timeout: 500
+      })
 
-      # handle_response(response)
+      handle_response(response)
     end
 
     private
