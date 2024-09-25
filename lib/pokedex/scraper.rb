@@ -69,6 +69,8 @@ module Pokedex
       end
 
       def save_pokemon_index(pokemon_list)
+        return Failure("No pokemon found") unless pokemon_list.any?
+
         Try do
           Pokemon.bulk_insert(pokemon_list)
           Pokemon.all

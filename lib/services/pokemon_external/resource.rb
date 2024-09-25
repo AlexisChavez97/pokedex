@@ -41,11 +41,12 @@ module PokemonExternal
       end
 
       def blocked?(response)
-        response.include?("NOINDEX,NOFOLLOW")
+        response.include?("NOINDEX,NOFOLLOW") || response.include?("ROBOTS")
       end
 
       def response_empty?(response)
-        response.include?("ROBOTS") || response.include?("<body></body>")
+        response.include?("<body></body>") ||
+        !response.include?('<li><a href="/us/pokedex/bulbasaur">1 - Bulbasaur</a></li>')
       end
 
       def bad_response?(response)
