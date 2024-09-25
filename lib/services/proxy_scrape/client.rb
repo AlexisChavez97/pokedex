@@ -3,12 +3,12 @@
 module ProxyScrape
   class Client
     include Dry::Monads[:result]
-    
+
     BASE_URL = "https://api.proxyscrape.com"
 
     def fetch_proxies
       Success(premium_proxies_list)
-      
+
       # response = connection.get("/v4/free-proxy-list/get", {
       #   request: "display_proxies",
       #   proxy_format: "protocolipport",

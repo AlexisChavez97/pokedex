@@ -17,4 +17,5 @@ gem "yaml"
 
 group :development, :test do
   gem "pry-byebug"
+  gem "rubocop-rails_config"
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Pokemon
+module PokemonExternal
   module Resources
     class PokemonInfo < Resource
       def get(params)
