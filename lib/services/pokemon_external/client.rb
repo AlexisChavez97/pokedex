@@ -1,12 +1,18 @@
 # frozen_string_literal: true
 
 module PokemonExternal
-  class SeleniumClient
+  class Client
     BASE_URL = "https://www.pokemon.com"
     MAX_RETRIES = Float::INFINITY
-    WAIT_TIME = 10
+    BACKOFF = 10
 
-    def get(resource:, **params)
+    def initialize
+      @use_proxy = false
+    end
+
+    def get(resource:, use_proxy:, **params)
+      @use_proxy = use_proxy
+
       with_retries do
         PokemonExternal::Resources.const_get(resource.classify).new(self).get(params)
       end
@@ -17,10 +23,10 @@ module PokemonExternal
     end
 
     def fetch_page(url)
-      puts "Attempting to fetch details for: #{url.split("/").last}"
+      puts "Attempting to fetch Pokédex data..."
 
       driver.navigate.to("#{BASE_URL}#{url}")
-      wait = Selenium::WebDriver::Wait.new(timeout: 10)
+      wait = Selenium::WebDriver::Wait.new(timeout: 20)
       wait.until { driver.find_element(tag_name: "body").displayed? }
       simulate_human_behavior
       driver.page_source
@@ -35,7 +41,7 @@ module PokemonExternal
           Timeout.timeout(30, &block)
         rescue Errno::ECONNREFUSED, Net::ReadTimeout, Selenium::WebDriver::Error::WebDriverError => e
           if retries <= MAX_RETRIES
-            sleep(WAIT_TIME)
+            sleep(BACKOFF)
             reset_driver
             retry
           else
@@ -49,15 +55,17 @@ module PokemonExternal
 
       def headless_options
         options = Selenium::WebDriver::Chrome::Options.new
-        options.add_argument("--headless")
+        # options.add_argument("--headless")
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1280,800")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--user-agent=#{user_agents.sample}")
-        proxy = sample_proxy
-        puts "Using proxy: #{proxy}"
-        options.add_argument("--proxy-server=#{proxy}")
+        if @use_proxy
+          proxy = sample_proxy
+          puts "Spinning up proxy..."
+          options.add_argument("--proxy-server=#{proxy}")
+        end
         options
       end
 

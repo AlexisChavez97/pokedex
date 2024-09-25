@@ -14,7 +14,8 @@ class Pokedex::CLITest < Minitest::Test
     input = StringIO.new("exit\n")
     output = StringIO.new
 
-    @scraper.expect(:fetch_and_save_pokemon_index, Success(nil))
+    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated), use_proxy: false)
+    @scraper.expect(:queue_and_fetch_all_pokemon_info, nil)
 
     simulate_cli_run(input, output) do
       @cli.start
@@ -28,7 +29,8 @@ class Pokedex::CLITest < Minitest::Test
     input = StringIO.new("nonexistent\nexit\n")
     output = StringIO.new
 
-    @scraper.expect(:fetch_and_save_pokemon_index, Success(nil))
+    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated), use_proxy: false)
+    @scraper.expect(:queue_and_fetch_all_pokemon_info, nil)
 
     Pokemon.stub :search, [] do
       simulate_cli_run(input, output) do
@@ -44,7 +46,7 @@ class Pokedex::CLITest < Minitest::Test
     input = StringIO.new("pikachu\n1\nexit\n")
     output = StringIO.new
 
-    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated))
+    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated), use_proxy: false)
     @scraper.expect(:queue_and_fetch_all_pokemon_info, nil)
 
     mock_pokemon = OpenStruct.new(
@@ -102,7 +104,7 @@ class Pokedex::CLITest < Minitest::Test
     input = StringIO.new("pikachu\n1\nexit\n")
     output = StringIO.new
 
-    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated))
+    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated), use_proxy: false)
     @scraper.expect(:queue_and_fetch_all_pokemon_info, nil)
     @scraper.expect(:priority_enqueue, nil, [Object])
 
@@ -152,7 +154,7 @@ class Pokedex::CLITest < Minitest::Test
     input = StringIO.new("electric\n1\nexit\n")
     output = StringIO.new
 
-    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated))
+    @scraper.expect(:fetch_and_save_pokemon_index, Success(:populated), use_proxy: false)
     @scraper.expect(:queue_and_fetch_all_pokemon_info, nil)
     @scraper.expect(:priority_enqueue, nil, [Object])
 

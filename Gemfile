@@ -2,6 +2,8 @@
 
 source "https://rubygems.org"
 
+ruby "3.2.2"
+
 gem "activesupport", require: ["active_support/inflector", "active_support/hash_with_indifferent_access"]
 gem "dry-monads"
 gem "faraday"

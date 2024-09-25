@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module Pokedex
-  class Scraper
+  class WebCrawler
     include Dry::Monads[:result, :try]
 
     attr_reader :client, :parser, :queue
 
-    def initialize(client: PokemonExternal::SeleniumClient.new, parser: Pokedex::Parser.new)
+    def initialize(client: PokemonExternal::Client.new, parser: Pokedex::Parser.new)
       @client = client
       @parser = parser
       @queue = QueueManager.new
@@ -14,14 +14,14 @@ module Pokedex
       @stop_fetching = false
     end
 
-    def fetch_and_save_pokemon_index
+    def fetch_and_save_pokemon_index(use_proxy: false)
       return Success(:populated) if pokedex_populated?
 
-      client.get(resource: "pokemon_index")
+      client.get(resource: "pokemon_index", use_proxy:)
             .bind { |html| parser.parse_pokemon_index(html) }
             .bind { |pokemon_list| save_pokemon_index(pokemon_list) }
             .fmap { |_| :populated }
-            .or { |error| Failure("Failed to fetch and pokemons: #{error}") }
+            .or { |error| Failure("Failed to fetch pokemons: #{error}") }
     end
 
     def queue_and_fetch_all_pokemon_info
@@ -58,8 +58,9 @@ module Pokedex
 
       def fetch_and_update_pokemon_info(pokemon)
         return Success(pokemon) unless pokemon.info_is_empty?
+        use_proxy = [true, false].sample
 
-        client.get(resource: "pokemon_info", name: pokemon.name)
+        client.get(resource: "pokemon_info", use_proxy:, name: pokemon.name)
               .bind { |html| parser.parse_pokemon_info(html) }
               .bind { |pokemon_info| update_pokemon_info(pokemon, pokemon_info) }
               .or do |error|
@@ -69,6 +70,8 @@ module Pokedex
       end
 
       def save_pokemon_index(pokemon_list)
+        return Failure("No pokemon found") unless pokemon_list.any?
+
         Try do
           Pokemon.bulk_insert(pokemon_list)
           Pokemon.all

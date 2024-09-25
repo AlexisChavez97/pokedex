@@ -17,35 +17,23 @@ module PokemonExternal
         cache_key = "#{url}?#{URI.encode_www_form(params)}"
 
         ApiRequest.cache(cache_key, CACHE_POLICY) do
-          case client
-          when PokemonExternal::SeleniumClient
-            handle_selenium(client.fetch_page(url))
-          when PokemonExternal::Client
-            handle_http(client.connection.get(url, params))
-          end
+          handle_response(client.fetch_page(url))
         end
       end
 
-      def handle_http(response)
-        return Failure("Not Found") if response.status == 404
-        return Failure("Bad Request") if response.status == 400
-        return Failure("Empty response") if response.body.empty?
-
-        Success(response.body)
-      end
-
-      def handle_selenium(response)
+      def handle_response(response)
         return Failure("Bad response") if bad_response?(response)
 
         Success(response)
       end
 
       def blocked?(response)
-        response.include?("NOINDEX,NOFOLLOW")
+        response.include?("NOINDEX,NOFOLLOW") || response.include?("ROBOTS")
       end
 
       def response_empty?(response)
-        response.include?("ROBOTS") || response.include?("<body></body>")
+        response.include?("<body></body>") ||
+        !response.include?('<li><a href="/us/pokedex/bulbasaur">1 - Bulbasaur</a></li>')
       end
 
       def bad_response?(response)
