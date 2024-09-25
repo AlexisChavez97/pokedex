@@ -59,4 +59,30 @@ class PokemonTest < Minitest::Test
     assert_equal 100, pokemon.stats[:special_defense]
     assert_equal 100, pokemon.stats[:speed]
   end
+
+  def test_search_by_name
+    @subject.save
+    @subject.update(name: "mr mime")
+    pokemon = Pokemon.search("mime").first
+
+    assert_equal 25, pokemon.pokedex_number
+  end
+
+  def test_search_by_type
+    @subject.save
+    @subject.update(types: ["grass", "poison"])
+
+    pokemon = Pokemon.search("grass").first
+
+    assert_equal 25, pokemon.pokedex_number
+  end
+
+  def test_search_by_ability
+    @subject.save
+    @subject.update(abilities: ["overgrow", "good as gold"])
+
+    pokemon = Pokemon.search("good").first
+
+    assert_equal 25, pokemon.pokedex_number
+  end
 end

@@ -22,8 +22,8 @@ class Pokedex::ParserTest < Minitest::Test
   def test_parse_pokemon_index_with_special_characters
     result = @parser.parse_pokemon_index(@index_html_with_special_characters)
     assert_equal(
-      [{ pokedex_number: 1001, name: "wo-chien" }, { pokedex_number: 1003, name: "sirfetchd" },
-      { pokedex_number: 1004, name: "mr-rime" }, { pokedex_number: 32, name: "nidoran-male" }],
+      [{ pokedex_number: 1001, name: "wo chien" }, { pokedex_number: 1003, name: "sirfetchd" },
+      { pokedex_number: 1004, name: "mr rime" }, { pokedex_number: 32, name: "nidoran male" }],
       result.value!
     )
   end
@@ -32,8 +32,8 @@ class Pokedex::ParserTest < Minitest::Test
     result = @parser.parse_pokemon_info(@info_html)
 
     assert_equal(
-      { types: ["Grass", "Poison"], abilities: ["Overgrow"],
-      stats: { hp: 3, attack: 0, defense: 3, special_attack: 0, special_defense: 3, speed: 0 } },
+      { types: ["grass", "poison"], abilities: ["overgrow", "good as gold"],
+      stats: { hp: 4, attack: 4, defense: 4, special_attack: 5, special_defense: 5, speed: 4 } },
       result.value!
     )
   end

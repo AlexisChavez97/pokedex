@@ -10,6 +10,8 @@ module Pokedex
       @client = client
       @parser = parser
       @queue = QueueManager.new
+      @fetch_thread = nil
+      @stop_fetching = false
     end
 
     def fetch_and_save_pokemon_index
@@ -35,10 +37,20 @@ module Pokedex
       Success(pokemon)
     end
 
+    def stop_fetching
+      @stop_fetching = true
+      @fetch_thread&.join(5)
+      @fetch_thread&.kill if @fetch_thread&.alive?
+      @fetch_thread = nil
+    end
+
     private
       def fetch_all_pokemon_info
-        Thread.new do
-          while pokemon = queue.next_in_queue
+        @stop_fetching = false
+        @fetch_thread = Thread.new do
+          until @stop_fetching
+            pokemon = queue.next_in_queue
+            break unless pokemon
             fetch_and_update_pokemon_info(pokemon)
           end
         end
@@ -50,7 +62,10 @@ module Pokedex
         client.get(resource: "pokemon_info", name: pokemon.name)
               .bind { |html| parser.parse_pokemon_info(html) }
               .bind { |pokemon_info| update_pokemon_info(pokemon, pokemon_info) }
-              .or { |error| puts "Failed to fetch and update pokemon info: #{error}" }
+              .or do |error|
+                puts "Failed to fetch and update #{pokemon.name}, retrying"
+                queue.enqueue_priority(pokemon)
+              end
       end
 
       def save_pokemon_index(pokemon_list)
@@ -63,6 +78,7 @@ module Pokedex
       def update_pokemon_info(pokemon, info)
         Try do
           pokemon.update(info)
+          puts "Detailed info for #{pokemon.humanized_name} available"
           pokemon
         end.to_result
       end

@@ -6,6 +6,7 @@ require "ostruct"
 class Pokedex::CLITest < Minitest::Test
   def setup
     @scraper = Minitest::Mock.new
+    @scraper.expect(:stop_fetching, nil)
     @cli = Pokedex::CLI.new(scraper: @scraper)
   end
 
@@ -51,8 +52,9 @@ class Pokedex::CLITest < Minitest::Test
       pokedex_number: 25,
       types: ["Electric"],
       abilities: ["Static"],
-      stats: { hp: 35, attack: 55, defense: 40, special_attack: 50, special_defense: 50, speed: 90 },
-      info_is_empty?: false
+      stats: { hp: 15, attack: 15, defense: 10, special_attack: 10, special_defense: 10, speed: 10 },
+      info_is_empty?: false,
+      humanized_name: "Pikachu"
     )
 
     Pokemon.stub :search, [mock_pokemon] do
@@ -64,7 +66,7 @@ class Pokedex::CLITest < Minitest::Test
     expected_output = <<~OUTPUT
       Initializing Pokedex...
       Fetching and saving Pokemon...
-      Pokédex data successfully fetched and saved.
+      Pokémon index successfully fetched and saved.
 
       Enter a Pokémon name to search (or type 'exit' to quit):
       Found 1 result(s):
@@ -74,8 +76,18 @@ class Pokedex::CLITest < Minitest::Test
       Pokémon: Pikachu (25)
       Types: Electric
       Abilities: Static
-      Stats: {:hp=>35, :attack=>55, :defense=>40, :special_attack=>50, :special_defense=>50, :speed=>90}
-      -------------------------
+
+      Hp              [████████████████████] 15/15
+
+      Attack          [████████████████████] 15/15
+
+      Defense         [█████████████░░░░░░░] 10/15
+
+      Special Attack  [█████████████░░░░░░░] 10/15
+
+      Special Defense [█████████████░░░░░░░] 10/15
+
+      Speed           [█████████████░░░░░░░] 10/15
 
       Enter a Pokémon name to search (or type 'exit' to quit):
       Goodbye!
@@ -100,7 +112,8 @@ class Pokedex::CLITest < Minitest::Test
       types: [],
       abilities: [],
       stats: {},
-      info_is_empty?: true
+      info_is_empty?: true,
+      humanized_name: "Pikachu"
     )
 
     Pokemon.stub :search, [mock_pokemon] do
@@ -112,7 +125,7 @@ class Pokedex::CLITest < Minitest::Test
     expected_output = <<~OUTPUT
       Initializing Pokedex...
       Fetching and saving Pokemon...
-      Pokédex data successfully fetched and saved.
+      Pokémon index successfully fetched and saved.
 
       Enter a Pokémon name to search (or type 'exit' to quit):
       Found 1 result(s):
@@ -122,8 +135,7 @@ class Pokedex::CLITest < Minitest::Test
       Pokémon: Pikachu (25)
       Types:#{' '}
       Abilities:#{' '}
-      Stats: {}
-      -------------------------
+
       Note: Detailed information for Pikachu is currently being fetched.
       Please check again in a few moments for complete information.
 
@@ -150,7 +162,8 @@ class Pokedex::CLITest < Minitest::Test
       types: [],
       abilities: [],
       stats: {},
-      info_is_empty?: true
+      info_is_empty?: true,
+      humanized_name: "Pikachu"
     )
 
     mock_raichu = OpenStruct.new(
@@ -159,7 +172,8 @@ class Pokedex::CLITest < Minitest::Test
       types: [],
       abilities: [],
       stats: {},
-      info_is_empty?: true
+      info_is_empty?: true,
+      humanized_name: "Raichu"
     )
 
     Pokemon.stub :search, [mock_pikachu, mock_raichu] do
@@ -171,7 +185,7 @@ class Pokedex::CLITest < Minitest::Test
     expected_output = <<~OUTPUT
       Initializing Pokedex...
       Fetching and saving Pokemon...
-      Pokédex data successfully fetched and saved.
+      Pokémon index successfully fetched and saved.
 
       Enter a Pokémon name to search (or type 'exit' to quit):
       Found 2 result(s):
@@ -182,8 +196,7 @@ class Pokedex::CLITest < Minitest::Test
       Pokémon: Pikachu (25)
       Types:#{' '}
       Abilities:#{' '}
-      Stats: {}
-      -------------------------
+
       Note: Detailed information for Pikachu is currently being fetched.
       Please check again in a few moments for complete information.
 

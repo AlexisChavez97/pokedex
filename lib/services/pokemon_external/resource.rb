@@ -4,7 +4,7 @@ module PokemonExternal
   class Resource
     include Dry::Monads[:result]
 
-    CACHE_POLICY = -> { Time.now - 1.day }
+    CACHE_POLICY = -> { Time.now - 86_400 } # 1 day
 
     attr_reader :client
 
@@ -41,11 +41,11 @@ module PokemonExternal
       end
 
       def blocked?(response)
-        response.include?("noindex,nofollow")
+        response.include?("NOINDEX,NOFOLLOW")
       end
 
       def response_empty?(response)
-        response.include?("Imperva") || response.include?("<body></body>")
+        response.include?("ROBOTS") || response.include?("<body></body>")
       end
 
       def bad_response?(response)
