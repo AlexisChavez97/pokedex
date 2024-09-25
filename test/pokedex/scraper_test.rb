@@ -23,7 +23,7 @@ class Pokedex::ScraperTest < Minitest::Test
   def test_fetch_and_save_pokemon_index_when_pokedex_is_empty
     Pokemon.delete_all
 
-    @client.expect(:get, Success(@mock_index_response), resource: "pokemon_index")
+    @client.expect(:get, Success(@mock_index_response), resource: "pokemon_index", use_proxy: false)
     @parser.expect(:parse_pokemon_index, Success(@mock_parsed_index), [@mock_index_response])
 
     result = @subject.fetch_and_save_pokemon_index
@@ -47,7 +47,7 @@ class Pokedex::ScraperTest < Minitest::Test
     assert_equal 1, Pokemon.all.count
 
     assert_raises(MockExpectationError) do
-      @client.expect(:get, Success(@mock_index_response), resource: "pokemon_index")
+      @client.expect(:get, Success(@mock_index_response), resource: "pokemon_index", use_proxy: false)
       @client.verify
     end
   end
@@ -94,7 +94,7 @@ class Pokedex::ScraperTest < Minitest::Test
   def test_fetch_and_update_pokemon_info_when_empty
     pokemon = Pokemon.new(name: "bulbasaur", pokedex_number: 1)
 
-    @client.expect(:get, Success(@mock_info_response), resource: "pokemon_info", name: "bulbasaur")
+    @client.expect(:get, Success(@mock_info_response), resource: "pokemon_info", name: "bulbasaur", use_proxy: Object)
     @parser.expect(:parse_pokemon_info, Success(@mock_parsed_info), [@mock_info_response])
 
     result = @subject.send(:fetch_and_update_pokemon_info, pokemon)

@@ -13,16 +13,20 @@ module Pokedex
     def start
       puts "Initializing Pokedex..."
       puts "Fetching and saving Pokemon..."
+      use_proxy = false
 
-      result = scraper.fetch_and_save_pokemon_index
+      loop do
+        result = scraper.fetch_and_save_pokemon_index(use_proxy:)
 
-      case result
-      when Success(:populated)
-        puts "Pokémon index successfully fetched and saved."
-        scraper.queue_and_fetch_all_pokemon_info
-      when Failure
-        puts result.failure
-        return
+        case result
+        when Success(:populated)
+          puts "Pokémon index successfully fetched and saved."
+          scraper.queue_and_fetch_all_pokemon_info
+          break
+        when Failure
+          puts result.failure
+          use_proxy = true
+        end
       end
 
       main_loop
