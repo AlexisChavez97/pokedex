@@ -10,7 +10,7 @@ module Pokedex
 
       doc.css("noscript ul li").each do |pokemon_li|
         link = pokemon_li.at_css("a")
-        name = link["href"].split("/").last
+        name = link["href"].split("/").last.tr("-", " ")
         number = link.text.split("-").first.strip.delete(",")
 
         pokemon_list << { pokedex_number: number.to_i, name: }
@@ -23,8 +23,8 @@ module Pokedex
 
     def parse_pokemon_info(html)
       doc = Nokogiri::HTML(html)
-      types = extract_types(doc)
-      abilities = extract_abilities(doc)
+      types = extract_types(doc).uniq
+      abilities = extract_abilities(doc).uniq
       stats = extract_stats(doc)
 
       pokemon_info = {
@@ -40,11 +40,15 @@ module Pokedex
 
     private
       def extract_types(doc)
-        doc.css(".dtm-type ul li a").map(&:text)
+        doc.css(".dtm-type ul li a").map do |type|
+          type.text.downcase
+        end
       end
 
       def extract_abilities(doc)
-        doc.css(".attribute-list li a .attribute-value").map(&:text)
+        doc.css(".attribute-list li a .attribute-value").map do |ability|
+          ability.text.downcase
+        end
       end
 
       def extract_stats(doc)

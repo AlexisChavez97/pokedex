@@ -17,8 +17,9 @@ module PokemonExternal
     end
 
     def fetch_page(url)
+      puts "Attempting to fetch details for: #{url.split("/").last}"
+
       driver.navigate.to("#{BASE_URL}#{url}")
-      puts "Fetching details for: #{url}"
       wait = Selenium::WebDriver::Wait.new(timeout: 10)
       wait.until { driver.find_element(tag_name: "body").displayed? }
       simulate_human_behavior
@@ -34,16 +35,13 @@ module PokemonExternal
           Timeout.timeout(30, &block)
         rescue Errno::ECONNREFUSED, Net::ReadTimeout, Selenium::WebDriver::Error::WebDriverError => e
           if retries <= MAX_RETRIES
-            puts "Connection failed, retrying in #{WAIT_TIME} seconds... (Attempt #{retries} of #{MAX_RETRIES})"
             sleep(WAIT_TIME)
             reset_driver
             retry
           else
-            puts "Max retries reached. Skipping this operation."
             raise e
           end
         rescue StandardError => e
-          puts "Unexpected error: #{e.message}"
           reset_driver
           retry
         end
@@ -57,7 +55,9 @@ module PokemonExternal
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--user-agent=#{user_agents.sample}")
-        options.add_argument("--proxy-server=#{sample_proxy}")
+        proxy = sample_proxy
+        puts "Using proxy: #{proxy}"
+        options.add_argument("--proxy-server=#{proxy}")
         options
       end
 
@@ -71,18 +71,14 @@ module PokemonExternal
       def sample_proxy
         ProxyScrape::Client.new.fetch_proxies
                            .fmap { |proxies| proxies.sample.strip if proxies.any? }
-                           .or do |error|
-          puts "Failed to fetch proxies: #{error}, defaulting to no proxy"
-          nil
-        end.value_or(nil)
+                           .or { nil }
+                           .value_or(nil)
       end
 
       def simulate_human_behavior
         scroll_randomly
         random_wait(1, 10)
         move_mouse_randomly
-      rescue => e
-        puts "Error during human behavior simulation: #{e.message}. Continuing..."
       end
 
       def scroll_randomly
@@ -99,8 +95,7 @@ module PokemonExternal
         x = rand(viewport_width)
         y = rand(viewport_height)
         driver.action.move_by(x, y).perform
-      rescue Selenium::WebDriver::Error::MoveTargetOutOfBoundsError => e
-        puts "Mouse movement error: #{e.message}. Skipping this action."
+      rescue Selenium::WebDriver::Error::MoveTargetOutOfBoundsError
       end
 
       def random_wait(min, max)

@@ -18,7 +18,7 @@ module Pokedex
 
       case result
       when Success(:populated)
-        puts "Pokédex data successfully fetched and saved."
+        puts "Pokémon index successfully fetched and saved."
         scraper.queue_and_fetch_all_pokemon_info
       when Failure
         puts result.failure
@@ -26,6 +26,8 @@ module Pokedex
       end
 
       main_loop
+    ensure
+      scraper.stop_fetching
     end
 
     def main_loop
@@ -34,7 +36,7 @@ module Pokedex
         input = gets.chomp.downcase
         break if input == "exit"
 
-        results = Pokemon.search(input)
+        results = Pokemon.search(input.tr(" ", "-"))
         if results.empty?
           puts "No results found for '#{input}'."
           next
@@ -51,7 +53,7 @@ module Pokedex
       def display_search_results(results)
         puts "Found #{results.length} result(s):"
         results.each_with_index do |pokemon, index|
-          puts "#{index + 1}. #{pokemon.name} (#{pokemon.pokedex_number})"
+          puts "#{index + 1}. #{pokemon.humanized_name} (#{pokemon.pokedex_number})"
         end
       end
 
@@ -77,11 +79,28 @@ module Pokedex
       end
 
       def display_result(pokemon)
-        puts "\nPokémon: #{pokemon.name} (#{pokemon.pokedex_number})"
+        puts "\nPokémon: #{pokemon.humanized_name} (#{pokemon.pokedex_number})"
         puts "Types: #{pokemon.types.join(', ')}"
         puts "Abilities: #{pokemon.abilities.join(', ')}"
-        puts "Stats: #{pokemon.stats}"
-        puts "-------------------------"
+        puts ""
+        display_stats(pokemon.stats)
+      end
+
+      def display_stats(stats)
+        max_stat = 15
+        bar_length = 20
+        stats.each_with_index do |(stat_name, stat_value), index|
+          stat_percentage = (stat_value.to_f / max_stat) * 100
+          filled_length = (stat_percentage / 100 * bar_length).round
+          empty_length = bar_length - filled_length
+
+          bar = "█" * filled_length + "░" * empty_length
+          formatted_name = stat_name.to_s.split("_").map(&:capitalize).join(" ").ljust(15)
+
+          puts "#{formatted_name} [#{bar}] #{stat_value}/#{max_stat}"
+
+          puts "" unless index == stats.size - 1
+        end
       end
   end
 end

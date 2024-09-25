@@ -33,10 +33,8 @@ module PokemonExternal
       def sample_proxy
         @proxy_client.fetch_proxies
                      .fmap { |proxies| proxies.sample.strip if proxies.any? }
-                     .or do |error|
-          puts "Failed to fetch proxies: #{error}, defaulting to no proxy"
-          nil
-        end.value_or(nil)
+                     .or { nil }
+                     .value_or(nil)
       end
   end
 end

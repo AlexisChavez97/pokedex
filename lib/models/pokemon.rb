@@ -20,8 +20,9 @@ class Pokemon < BaseModel
     conditions = []
     conditions << Sequel.ilike(:name, "%#{query}%")
     conditions << { pokedex_number: query.to_i } if query.to_i > 0
-    conditions << Sequel.pg_array_op(:types).contains([query])
-    conditions << Sequel.pg_array_op(:abilities).contains([query])
+
+    conditions << Sequel.lit("EXISTS (SELECT 1 FROM unnest(types) AS t WHERE t ILIKE ?)", "%#{query}%")
+    conditions << Sequel.lit("EXISTS (SELECT 1 FROM unnest(abilities) AS a WHERE a ILIKE ?)", "%#{query}%")
 
     return [] if conditions.empty?
 
@@ -41,6 +42,10 @@ class Pokemon < BaseModel
 
   def info_is_empty?
     info.all? { |_, value| value.empty? }
+  end
+
+  def humanized_name
+    name.split("-").map(&:capitalize).join(" ")
   end
 
   private
