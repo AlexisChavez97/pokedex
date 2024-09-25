@@ -15,7 +15,6 @@ module Pokedex
     end
 
     def fetch_and_save_pokemon_index(use_proxy: false)
-      puts use_proxy
       return Success(:populated) if pokedex_populated?
 
       client.get(resource: "pokemon_index", use_proxy:)
