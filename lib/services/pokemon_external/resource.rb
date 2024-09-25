@@ -22,7 +22,6 @@ module PokemonExternal
       end
 
       def handle_response(response)
-        puts response
         return Failure("Bad response") if bad_response?(response)
 
         Success(response)
