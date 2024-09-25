@@ -6,7 +6,7 @@ module Pokedex
 
     attr_reader :client, :parser, :queue
 
-    def initialize(client: PokemonExternal::Client.new, parser: Parser.new)
+    def initialize(client: randomize_client, parser: Parser.new)
       @client = client
       @parser = parser
       @queue = QueueManager.new
@@ -60,7 +60,7 @@ module Pokedex
       def fetch_and_update_pokemon_info(pokemon)
         return Success(pokemon) unless pokemon.info_is_empty?
 
-        use_proxy = [true, false].sample
+        use_proxy = [false, true].sample
 
         client.get(resource: "pokemon_info", use_proxy:, name: pokemon.name)
               .bind { |html| parser.parse_pokemon_info(html) }
@@ -90,8 +90,8 @@ module Pokedex
         Pokemon.all.size > 0
       end
 
-      def random_client
-        [PokemonExternal::SeleniumClient.new].sample
+      def randomize_client
+        [PokemonExternal::SeleniumClient.new, PokemonExternal::PlaywrightClient.new].sample
       end
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PokemonExternal
-  class Client
+  class SeleniumClient
     BASE_URL = "https://www.pokemon.com"
     MAX_RETRIES = Float::INFINITY
     BACKOFF = 10
@@ -48,6 +48,8 @@ module PokemonExternal
       def browser
         driver = Selenium::WebDriver.for(:chrome, options:)
 
+        apply_stealth_mode(driver)
+
         yield(driver)
       ensure
         driver&.quit
@@ -59,11 +61,25 @@ module PokemonExternal
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-setuid-sandbox")
         options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--disable-infobars")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-gpu")
         options.add_argument("--window-size=#{generate_random_viewport[:width]},#{generate_random_viewport[:height]}")
         options.add_argument("--user-agent=#{user_agents.sample}")
         options.add_argument("--proxy-server=#{sample_proxy}") if @use_proxy
 
         options
+      end
+
+      def apply_stealth_mode(driver)
+        driver.execute_cdp("Page.addScriptToEvaluateOnNewDocument", source: <<-JS)
+          Object.defineProperty(navigator, 'webdriver', {
+            get: () => undefined
+          });
+        JS
+
+        driver.execute_cdp("Network.setUserAgentOverride", userAgent: user_agents.sample, acceptLanguage: "en-US,en;q=0.9")
       end
 
       def user_agents
@@ -101,7 +117,7 @@ module PokemonExternal
         driver.manage.window.resize_to(new_width, new_height)
       end
 
-      def natural_mouse_movements(driver, movements: 2)  # Reduced to just 2 movements
+      def natural_mouse_movements(driver, movements: 2)
         viewport_width = driver.execute_script("return window.innerWidth;")
         viewport_height = driver.execute_script("return window.innerHeight;")
 
