@@ -52,7 +52,6 @@ module Pokedex
             pokemon = queue.next_in_queue
             break unless pokemon
             fetch_and_update_pokemon_info(pokemon)
-            sleep(10)
           end
         end
       end

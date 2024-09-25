@@ -6,7 +6,7 @@ module PokemonExternal
   class PlaywrightClient
     BASE_URL = "https://www.pokemon.com"
     MAX_RETRIES = Float::INFINITY
-    BACKOFF = 10
+    BACKOFF = 5
 
     def initialize
       playwright

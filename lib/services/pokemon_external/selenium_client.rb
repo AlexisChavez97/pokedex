@@ -4,7 +4,7 @@ module PokemonExternal
   class SeleniumClient
     BASE_URL = "https://www.pokemon.com"
     MAX_RETRIES = Float::INFINITY
-    BACKOFF = 10
+    BACKOFF = 5
 
     def initialize
       @use_proxy = false
