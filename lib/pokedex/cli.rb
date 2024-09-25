@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pry"
 module Pokedex
   class CLI
     include Dry::Monads[:result, :try]

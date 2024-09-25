@@ -33,7 +33,7 @@ class Pokedex::ParserTest < Minitest::Test
 
     assert_equal(
       { types: ["Grass", "Poison"], abilities: ["Overgrow"],
-      stats: { hp: 3, attack: 0, defense: 3, special_attack: 0, special_defense: 3, speed: 0 } },
+      stats: { hp: 4, attack: 4, defense: 4, special_attack: 5, special_defense: 5, speed: 4 } },
       result.value!
     )
   end

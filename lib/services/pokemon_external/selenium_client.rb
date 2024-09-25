@@ -3,9 +3,13 @@
 module PokemonExternal
   class SeleniumClient
     BASE_URL = "https://www.pokemon.com"
+    MAX_RETRIES = Float::INFINITY
+    WAIT_TIME = 10
 
     def get(resource:, **params)
-      PokemonExternal::Resources.const_get(resource.classify).new(self).get(params)
+      with_retries do
+        PokemonExternal::Resources.const_get(resource.classify).new(self).get(params)
+      end
     end
 
     def driver
@@ -24,6 +28,27 @@ module PokemonExternal
     end
 
     private
+      def with_retries(&block)
+        retries = 0
+        begin
+          Timeout.timeout(30, &block)
+        rescue Errno::ECONNREFUSED, Net::ReadTimeout, Selenium::WebDriver::Error::WebDriverError => e
+          if retries <= MAX_RETRIES
+            puts "Connection failed, retrying in #{WAIT_TIME} seconds... (Attempt #{retries} of #{MAX_RETRIES})"
+            sleep(WAIT_TIME)
+            reset_driver
+            retry
+          else
+            puts "Max retries reached. Skipping this operation."
+            raise e
+          end
+        rescue StandardError => e
+          puts "Unexpected error: #{e.message}"
+          reset_driver
+          retry
+        end
+      end
+
       def headless_options
         options = Selenium::WebDriver::Chrome::Options.new
         options.add_argument("--headless")
@@ -32,9 +57,7 @@ module PokemonExternal
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--user-agent=#{user_agents.sample}")
-        # proxy = sample_proxy
-        # puts "Using proxy: #{proxy}"
-        # options.add_argument("--proxy-server=#{proxy}")
+        options.add_argument("--proxy-server=#{sample_proxy}")
         options
       end
 
@@ -82,6 +105,10 @@ module PokemonExternal
 
       def random_wait(min, max)
         sleep rand(min..max)
+      end
+
+      def reset_driver
+        @driver = nil
       end
   end
 end

@@ -23,7 +23,6 @@ module Pokedex
 
     def parse_pokemon_info(html)
       doc = Nokogiri::HTML(html)
-
       types = extract_types(doc)
       abilities = extract_abilities(doc)
       stats = extract_stats(doc)
@@ -50,20 +49,17 @@ module Pokedex
 
       def extract_stats(doc)
         stats_map = {}
-        stats_elements = doc.css(".pokemon-stats-info ul li")
+        stats_elements = doc.css(".pokemon-stats-info ul > li")
 
-        stats_map[:hp] = get_stat_value(stats_elements[0])
-        stats_map[:attack] = get_stat_value(stats_elements[1])
-        stats_map[:defense] = get_stat_value(stats_elements[2])
-        stats_map[:special_attack] = get_stat_value(stats_elements[3])
-        stats_map[:special_defense] = get_stat_value(stats_elements[4])
-        stats_map[:speed] = get_stat_value(stats_elements[5])
+        stats_elements.each do |stat_element|
+          next if stat_element.css("span").text.empty?
+
+          stat_name = stat_element.css("span").text.downcase.tr(" ", "_").to_sym
+          stat_value = stat_element.css(".gauge .meter").attr("data-value").to_s.to_i
+          stats_map[stat_name] = stat_value
+        end
 
         stats_map
-      end
-
-      def get_stat_value(stat_element)
-        stat_element.css(".gauge .meter").attr("data-value").to_s.to_i
       end
   end
 end

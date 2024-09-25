@@ -50,7 +50,10 @@ module Pokedex
         client.get(resource: "pokemon_info", name: pokemon.name)
               .bind { |html| parser.parse_pokemon_info(html) }
               .bind { |pokemon_info| update_pokemon_info(pokemon, pokemon_info) }
-              .or { |error| puts "Failed to fetch and update pokemon info: #{error}" }
+              .or do |error|
+                puts "Failed to fetch and update pokemon info: #{error}"
+                queue.enqueue_priority(pokemon)
+              end
       end
 
       def save_pokemon_index(pokemon_list)
