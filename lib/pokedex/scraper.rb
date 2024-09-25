@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "pry"
-
 module Pokedex
   class Scraper
     include Dry::Monads[:result, :try]

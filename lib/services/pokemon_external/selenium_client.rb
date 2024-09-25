@@ -14,7 +14,7 @@ module PokemonExternal
 
     def fetch_page(url)
       driver.navigate.to("#{BASE_URL}#{url}")
-      puts "Visting: #{BASE_URL}#{url}"
+      puts "Fetching details for: #{url}"
       wait = Selenium::WebDriver::Wait.new(timeout: 10)
       wait.until { driver.find_element(tag_name: "body").displayed? }
       simulate_human_behavior

@@ -4,7 +4,7 @@ module PokemonExternal
   class Resource
     include Dry::Monads[:result]
 
-    CACHE_POLICY = -> { Time.now - 1 }
+    CACHE_POLICY = -> { Time.now - 1.day }
 
     attr_reader :client
 
