@@ -5,7 +5,7 @@ module Pokedex
     include Dry::Monads[:result, :try]
     attr_reader :scraper
 
-    def initialize(scraper: Pokedex::Scraper.new)
+    def initialize(scraper: WebCrawler.new)
       @scraper = scraper
     end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PokemonExternal
-  class WebCrawler
+  class Client
     BASE_URL = "https://www.pokemon.com"
     MAX_RETRIES = Float::INFINITY
     BACKOFF = 10

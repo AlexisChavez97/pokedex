@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module Pokedex
-  class Scraper
+  class WebCrawler
     include Dry::Monads[:result, :try]
 
     attr_reader :client, :parser, :queue
 
-    def initialize(client: PokemonExternal::WebCrawler.new, parser: Pokedex::Parser.new)
+    def initialize(client: PokemonExternal::Client.new, parser: Pokedex::Parser.new)
       @client = client
       @parser = parser
       @queue = QueueManager.new

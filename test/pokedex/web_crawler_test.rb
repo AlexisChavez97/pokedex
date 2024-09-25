@@ -2,13 +2,13 @@
 
 require_relative "../test_helper"
 
-class Pokedex::ScraperTest < Minitest::Test
+class Pokedex::WebCrawlerTest < Minitest::Test
   def setup
     super
     @client = Minitest::Mock.new
     @parser = Minitest::Mock.new
     @queue = Minitest::Mock.new
-    @subject = Pokedex::Scraper.new(client: @client, parser: @parser)
+    @subject = Pokedex::WebCrawler.new(client: @client, parser: @parser)
     @subject.instance_variable_set(:@queue, @queue)
     @mock_index_response = "mock index HTML"
     @mock_info_response = "mock info HTML"
