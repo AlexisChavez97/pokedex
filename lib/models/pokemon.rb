@@ -9,7 +9,7 @@ class Pokemon < BaseModel
 
   columns :pokedex_number, :name, :types, :stats, :abilities, :updated_at, :created_at
 
-  CACHE_POLICY = 300 # 5 minutes in seconds
+  CACHE_POLICY = 300 # 5 minutes
   @@search_cache = {}
 
   def initialize(attributes = {})
