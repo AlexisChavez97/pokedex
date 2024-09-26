@@ -23,7 +23,8 @@ module PokemonExternal
     end
 
     def fetch_page(url)
-      puts "Attempting to fetch Pokédex data..."
+      puts "Fetching_data..."
+      puts "Enter a Pokémon name to search (or type 'exit' to quit):"
 
       driver.navigate.to("#{BASE_URL}#{url}")
       wait = Selenium::WebDriver::Wait.new(timeout: 20)
@@ -63,7 +64,7 @@ module PokemonExternal
         options.add_argument("--user-agent=#{user_agents.sample}")
         if @use_proxy
           proxy = sample_proxy
-          puts "Spinning up proxy..."
+
           options.add_argument("--proxy-server=#{proxy}")
         end
         options

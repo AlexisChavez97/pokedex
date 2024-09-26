@@ -6,7 +6,7 @@ module Pokedex
 
     attr_reader :client, :parser, :queue
 
-    def initialize(client: PokemonExternal::Client.new, parser: Pokedex::Parser.new)
+    def initialize(client: PokemonExternal::Client.new, parser: Parser.new)
       @client = client
       @parser = parser
       @queue = QueueManager.new
@@ -88,6 +88,10 @@ module Pokedex
 
       def pokedex_populated?
         Pokemon.all.size > 0
+      end
+
+      def random_client
+        [PokemonExternal::SeleniumClient.new].sample
       end
   end
 end
