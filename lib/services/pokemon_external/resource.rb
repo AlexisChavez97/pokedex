@@ -36,8 +36,12 @@ module PokemonExternal
         response.include?("<body></body>")
       end
 
+      def proxy_failed?(response)
+        response.include?("took too long to respond")
+      end
+
       def bad_response?(response)
-        response_empty?(response) || blocked?(response)
+        response_empty?(response) || blocked?(response) || proxy_failed?(response)
       end
   end
 end

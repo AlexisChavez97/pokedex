@@ -4,18 +4,22 @@ module ProxyScrape
   class Client
     include Dry::Monads[:result]
 
+    CACHE_POLICY = -> { Time.now - 300 } # 5 minutes
+
     BASE_URL = "https://api.proxyscrape.com"
 
     def fetch_proxies
-      response = connection.get("/v4/free-proxy-list/get", {
-        request: "display_proxies",
-        proxy_format: "protocolipport",
-        format: "text",
-        anonymity: "elite",
-        protocol: "http",
-        country: "us",
-        timeout: 500
-      })
+      response = ApiRequest.cache(cache_key, CACHE_POLICY) do
+        connection.get("/v4/free-proxy-list/get", {
+          request: "display_proxies",
+          proxy_format: "protocolipport",
+          format: "text",
+          anonymity: "elite",
+          protocol: "http",
+          country: "us",
+          timeout: 500
+        })
+      end
 
       handle_response(response)
     end

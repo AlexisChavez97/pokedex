@@ -34,7 +34,7 @@ module PokemonExternal
       def with_retries(&block)
         retries = 0
         begin
-          block.call
+          yield
         rescue Errno::ECONNREFUSED, Net::ReadTimeout, Selenium::WebDriver::Error::WebDriverError => e
           if retries <= MAX_RETRIES
             sleep(BACKOFF)
