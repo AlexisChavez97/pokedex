@@ -55,7 +55,7 @@ module PokemonExternal
 
       def options
         options = Selenium::WebDriver::Chrome::Options.new
-        # options.add_argument("--headless")
+        options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-setuid-sandbox")
         options.add_argument("--disable-blink-features=AutomationControlled")
