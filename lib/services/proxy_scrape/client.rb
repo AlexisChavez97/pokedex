@@ -5,23 +5,13 @@ module ProxyScrape
     include Dry::Monads[:result]
 
     CACHE_POLICY = -> { Time.now - 300 } # 5 minutes
-
     BASE_URL = "https://api.proxyscrape.com"
 
     def fetch_proxies
-      response = ApiRequest.cache(cache_key, CACHE_POLICY) do
-        connection.get("/v4/free-proxy-list/get", {
-          request: "display_proxies",
-          proxy_format: "protocolipport",
-          format: "text",
-          anonymity: "elite",
-          protocol: "http",
-          country: "us",
-          timeout: 500
-        })
+      ApiRequest.cache(cache_key, CACHE_POLICY) do
+        response = connection.get("/v4/free-proxy-list/get", proxy_params)
+        handle_response(response)
       end
-
-      handle_response(response)
     end
 
     private
@@ -31,6 +21,25 @@ module ProxyScrape
           conn.headers["Accept"] = "text/plain"
           conn.adapter Faraday.default_adapter
         end
+      end
+
+      def proxy_params
+        {
+          request: "display_proxies",
+          proxy_format: "protocolipport",
+          format: "text",
+          anonymity: "elite",
+          protocol: "http",
+          country: "us",
+          timeout: 500
+        }
+      end
+
+      def cache_key
+        uri = URI.parse(BASE_URL)
+        uri.path = "/v4/free-proxy-list/get"
+        uri.query = URI.encode_www_form(proxy_params)
+        uri.to_s
       end
 
       def handle_response(response)
