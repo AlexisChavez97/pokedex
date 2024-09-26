@@ -9,6 +9,9 @@ class Pokemon < BaseModel
 
   columns :pokedex_number, :name, :types, :stats, :abilities, :updated_at, :created_at
 
+  CACHE_POLICY = 300 # 5 minutes in seconds
+  @@search_cache = {}
+
   def initialize(attributes = {})
     super
     @types ||= []
@@ -17,6 +20,19 @@ class Pokemon < BaseModel
   end
 
   def self.search(query)
+    cache_key = query.downcase
+    cached_result = @@search_cache[cache_key]
+
+    if cached_result && (Time.now - cached_result[:timestamp] < CACHE_POLICY)
+      return cached_result[:results]
+    end
+
+    results = perform_search(query)
+    @@search_cache[cache_key] = { results:, timestamp: Time.now }
+    results
+  end
+
+  def self.perform_search(query)
     conditions = []
     conditions << Sequel.ilike(:name, "%#{query}%")
     conditions << { pokedex_number: query.to_i } if query.to_i > 0
