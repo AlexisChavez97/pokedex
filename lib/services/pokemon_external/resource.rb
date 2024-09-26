@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pry"
 module PokemonExternal
   class Resource
     include Dry::Monads[:result]
@@ -32,8 +33,7 @@ module PokemonExternal
       end
 
       def response_empty?(response)
-        response.include?("<body></body>") ||
-        !response.include?('<li><a href="/us/pokedex/bulbasaur">1 - Bulbasaur</a></li>')
+        response.include?("<body></body>")
       end
 
       def bad_response?(response)

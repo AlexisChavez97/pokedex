@@ -68,7 +68,7 @@ class Pokedex::CLITest < Minitest::Test
     expected_output = <<~OUTPUT
       Initializing Pokedex...
       Fetching and saving Pokemon...
-      Pokémon index successfully fetched and saved.
+      Missing Pokémon data will continue to be fetched in the background.
 
       Enter a Pokémon name to search (or type 'exit' to quit):
       Found 1 result(s):
@@ -127,7 +127,7 @@ class Pokedex::CLITest < Minitest::Test
     expected_output = <<~OUTPUT
       Initializing Pokedex...
       Fetching and saving Pokemon...
-      Pokémon index successfully fetched and saved.
+      Missing Pokémon data will continue to be fetched in the background.
 
       Enter a Pokémon name to search (or type 'exit' to quit):
       Found 1 result(s):
@@ -187,7 +187,7 @@ class Pokedex::CLITest < Minitest::Test
     expected_output = <<~OUTPUT
       Initializing Pokedex...
       Fetching and saving Pokemon...
-      Pokémon index successfully fetched and saved.
+      Missing Pokémon data will continue to be fetched in the background.
 
       Enter a Pokémon name to search (or type 'exit' to quit):
       Found 2 result(s):

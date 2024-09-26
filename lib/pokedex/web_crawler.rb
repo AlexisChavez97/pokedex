@@ -52,21 +52,20 @@ module Pokedex
             pokemon = queue.next_in_queue
             break unless pokemon
             fetch_and_update_pokemon_info(pokemon)
+            sleep(10)
           end
         end
       end
 
       def fetch_and_update_pokemon_info(pokemon)
         return Success(pokemon) unless pokemon.info_is_empty?
+
         use_proxy = [true, false].sample
 
         client.get(resource: "pokemon_info", use_proxy:, name: pokemon.name)
               .bind { |html| parser.parse_pokemon_info(html) }
               .bind { |pokemon_info| update_pokemon_info(pokemon, pokemon_info) }
-              .or do |error|
-                puts "Failed to fetch and update #{pokemon.name}, retrying"
-                queue.enqueue_priority(pokemon)
-              end
+              .or { |error| queue.enqueue_priority(pokemon) }
       end
 
       def save_pokemon_index(pokemon_list)
@@ -79,9 +78,10 @@ module Pokedex
       end
 
       def update_pokemon_info(pokemon, info)
+        return Failure("No info found") if info.values.any?(&:empty?)
+
         Try do
           pokemon.update(info)
-          puts "Detailed info for #{pokemon.humanized_name} available"
           pokemon
         end.to_result
       end
